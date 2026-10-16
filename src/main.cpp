@@ -34,7 +34,8 @@ int main() {
         if (command == "SET") {
             std::string key;
             std::string value;
-            stream >> key >> value;
+            stream >> key >> std::ws;
+            std::getline(stream, value);
             store[key] = value;
             std::cout << "OK\n";
         } else if (command == "GET") {
