@@ -36,16 +36,26 @@ int main() {
             std::string value;
             stream >> key >> std::ws;
             std::getline(stream, value);
-            store[key] = value;
-            std::cout << "OK\n";
+
+            if (key.empty() || value.empty()) {
+                std::cout << "ERR usage: SET key value\n";
+            } else {
+                store[key] = value;
+                std::cout << "OK\n";
+            }
         } else if (command == "GET") {
             std::string key;
             stream >> key;
-            auto it = store.find(key);
-            if (it == store.end()) {
-                std::cout << "(nil)\n";
+
+            if (key.empty()) {
+                std::cout << "ERR usage: GET key\n";
             } else {
-                std::cout << it->second << '\n';
+                auto it = store.find(key);
+                if (it == store.end()) {
+                    std::cout << "(nil)\n";
+                } else {
+                    std::cout << it->second << '\n';
+                }               
             }
         } else {
             std::cout << "ERR unknown command\n";
