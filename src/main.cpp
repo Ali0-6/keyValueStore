@@ -69,6 +69,17 @@ int main() {
                 std::cout << store.erase(key) << '\n';
             }
         }
+
+        else if (command == "EXISTS") {
+            std::string key;
+            stream >> key;
+
+            if (key.empty()) {
+                std::cout << "ERR usage: EXISTS key\n";
+            } else {
+                std::cout << store.count(key) << '\n';
+            }
+        }
         
         else {
             std::cout << "ERR unknown command\n";
