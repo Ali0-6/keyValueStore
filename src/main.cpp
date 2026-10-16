@@ -43,7 +43,8 @@ int main() {
                 store[key] = value;
                 std::cout << "OK\n";
             }
-        } else if (command == "GET") {
+        }
+        else if (command == "GET") {
             std::string key;
             stream >> key;
 
@@ -57,7 +58,19 @@ int main() {
                     std::cout << it->second << '\n';
                 }               
             }
-        } else {
+        }
+        else if (command == "DEL") {
+            std::string key;
+            stream >> key;
+
+            if (key.empty()) {
+                std::cout << "ERR usage: DEL key\n";
+            } else {
+                std::cout << store.erase(key) << '\n';
+            }
+        }
+        
+        else {
             std::cout << "ERR unknown command\n";
         }
     }
