@@ -2,8 +2,10 @@
 #include <iostream>
 #include <sstream>
 #include <string>
+#include <unordered_map>
 
 int main() {
+    std::unordered_map<std::string, std::string> store;
     std::string line;
 
     while (true) {
@@ -29,7 +31,24 @@ int main() {
             break;
         }
 
-        std::cout << "Command: " << command << '\n';
+        if (command == "SET") {
+            std::string key;
+            std::string value;
+            stream >> key >> value;
+            store[key] = value;
+            std::cout << "OK\n";
+        } else if (command == "GET") {
+            std::string key;
+            stream >> key;
+            auto it = store.find(key);
+            if (it == store.end()) {
+                std::cout << "(nil)\n";
+            } else {
+                std::cout << it->second << '\n';
+            }
+        } else {
+            std::cout << "ERR unknown command\n";
+        }
     }
 
     return 0;
