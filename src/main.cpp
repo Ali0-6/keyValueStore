@@ -4,6 +4,8 @@
 #include <string>
 #include <unordered_map>
 #include <optional>
+#include <fstream>
+
 
 class KeyValueStore
 {
@@ -31,6 +33,48 @@ public:
     bool exists(const std::string &key) const
     {
         return data_.count(key) == 1;
+    }
+
+        bool save(const std::string &path) const
+    {
+        std::ofstream out(path);
+        if (!out)
+        {
+            return false;
+        }
+
+        for (const auto &[key, value] : data_)
+        {
+            out << key << ' ' << value << '\n';
+        }
+
+        return static_cast<bool>(out);
+    }
+
+    bool load(const std::string &path)
+    {
+        std::ifstream in(path);
+        if (!in)
+        {
+            return false;
+        }
+
+        std::string line;
+        while (std::getline(in, line))
+        {
+            std::istringstream line_stream(line);
+            std::string key;
+            std::string value;
+            line_stream >> key >> std::ws;
+            std::getline(line_stream, value);
+
+            if (!key.empty() && !value.empty())
+            {
+                data_[key] = value;
+            }
+        }
+
+        return true;
     }
 
 private:
@@ -112,6 +156,7 @@ int main()
 {
     KeyValueStore store;
     std::string line;
+    store.load("data.db");
 
     while (true)
     {
@@ -163,6 +208,9 @@ int main()
             std::cout << "ERR unknown command\n";
         }
     }
-
+    if (!store.save("data.db"))
+    {
+        std::cout << "ERR could not save data\n";
+    }
     return 0;
 }
