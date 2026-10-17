@@ -3,9 +3,42 @@
 #include <sstream>
 #include <string>
 #include <unordered_map>
+#include <optional>
 
-void handle_set(std::unordered_map<std::string, std::string> &store,
-                std::istringstream &stream)
+class KeyValueStore
+{
+public:
+    void set(const std::string &key, const std::string &value)
+    {
+        data_[key] = value;
+    }
+
+    std::optional<std::string> get(const std::string &key) const
+    {
+        auto it = data_.find(key);
+        if (it == data_.end())
+        {
+            return std::nullopt;
+        }
+        return it->second;
+    }
+
+    std::size_t del(const std::string &key)
+    {
+        return data_.erase(key);
+    }
+
+    bool exists(const std::string &key) const
+    {
+        return data_.count(key) == 1;
+    }
+
+private:
+    std::unordered_map<std::string, std::string> data_;
+};
+
+
+void handle_set(KeyValueStore &store, std::istringstream &stream)
 {
     std::string key;
     std::string value;
@@ -18,13 +51,12 @@ void handle_set(std::unordered_map<std::string, std::string> &store,
     }
     else
     {
-        store[key] = value;
+        store.set(key,value);
         std::cout << "OK\n";
     }
 }
 
-void handle_get(std::unordered_map<std::string, std::string> &store,
-                std::istringstream &stream)
+void handle_get(KeyValueStore &store, std::istringstream &stream)
 {
     std::string key;
     stream >> key;
@@ -35,20 +67,19 @@ void handle_get(std::unordered_map<std::string, std::string> &store,
     }
     else
     {
-        auto it = store.find(key);
-        if (it == store.end())
+        auto value = store.get(key);
+        if (!value)
         {
             std::cout << "(nil)\n";
         }
         else
         {
-            std::cout << it->second << '\n';
+            std::cout << *value << '\n';
         }
     }
 }
 
-void handle_del(std::unordered_map<std::string, std::string> &store,
-                std::istringstream &stream) {
+void handle_del(KeyValueStore &store, std::istringstream &stream) {
     std::string key;
     stream >> key;
 
@@ -58,13 +89,12 @@ void handle_del(std::unordered_map<std::string, std::string> &store,
     }
     else
     {
-        std::cout << store.erase(key) << '\n';
+        std::cout << store.del(key) << '\n';
     }
 }
 
 
-void handle_exists(std::unordered_map<std::string, std::string> &store,
-                std::istringstream &stream) {
+void handle_exists(KeyValueStore &store, std::istringstream &stream) {
     std::string key;
     stream >> key;
 
@@ -74,13 +104,13 @@ void handle_exists(std::unordered_map<std::string, std::string> &store,
     }
     else
     {
-        std::cout << store.count(key) << '\n';
+        std::cout << store.exists(key) << '\n';
     }
 }
 
 int main()
 {
-    std::unordered_map<std::string, std::string> store;
+    KeyValueStore store;
     std::string line;
 
     while (true)
